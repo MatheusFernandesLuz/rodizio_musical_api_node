@@ -31,7 +31,9 @@ class RodizioController {
   async getRodizio(req: Request, res: Response) {
     const data = req.body as GetRodizio;
     const repo = getRepository(Musico);
+    let musicos: Musico[] = [];
     let resultado: Musico[] = [];
+    let ids = [];
 
     const vozes = [
       {
@@ -53,37 +55,47 @@ class RodizioController {
       }
     ];
 
-    // 1 - Buscar um músico franco de cada voz
+    // TODO: Se não houver músico franco na voz principal, verifica na voz alternativa.
+    // TODO: Retonar os dias de disponibilidade e as vozes que toca
+
     for (let i = 0; i < vozes.length; i++) {
+      let limit = vozes[i].qtd;
 
       let franco = await repo.createQueryBuilder("musico")
-      .leftJoin("musico.vozes", "voz")
-      .leftJoin("musico.cultos", "culto")
+      .leftJoinAndSelect("musico.vozes", "voz")
+      .leftJoinAndSelect("musico.cultos", "culto")
       .where(`voz.nome = '${vozes[i].voz}'`)
       .andWhere(`culto.nome = '${data.culto}'`)
       .andWhere("musico.franqueza > 1")
       .orderBy("musico.qtd_tocada", "ASC")
       .getOne();
       
-      resultado.push(franco);
-
-      let limit = vozes[i].qtd - 1;
+      
+      if (franco) {
+        musicos.push(franco);
+        limit = vozes[i].qtd - 1;
+      }
       
       if (limit > 0) {
         let outros = await repo.createQueryBuilder("musico")
-        .leftJoin("musico.vozes", "voz")
-        .leftJoin("musico.cultos", "culto")
+        .leftJoinAndSelect("musico.vozes", "voz")
+        .leftJoinAndSelect("musico.cultos", "culto")
         .where(`voz.nome = '${vozes[i].voz}'`)
         .andWhere(`culto.nome = '${data.culto}'`)
-        .andWhere(`musico.id NOT IN ('${franco.id}')`)
+        .andWhere(`musico.id NOT IN ('${franco && franco.id}')`)
         .orderBy("musico.qtd_tocada", "ASC")      
         .limit(limit)
         .getMany();
         
-        resultado.push(...outros);
+        musicos.push(...outros);
       }
     }
 
+    for (let i = 0; i < musicos.length; i++) {
+      ids.push(musicos[i].id)
+    }
+
+    resultado = await repo.find({ where: `musico.id IN ('${ids.join("','")}')` });
     return res.status(StatusCodes.OK).json(resultado);
   }
 }
