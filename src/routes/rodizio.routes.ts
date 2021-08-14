@@ -2,8 +2,9 @@ import { Router } from "express";
 import { RodizioController } from "../controllers/RodizioController";
 
 const rodizioRoutes = Router();
-const estadoController = new RodizioController();
+const rodizioController = new RodizioController();
 
-rodizioRoutes.get('/sabado', estadoController.obterMusicosSabado);
+rodizioRoutes.get('/franco', rodizioController.obterMusicoFranco);
+rodizioRoutes.get('/rodizio', rodizioController.getRodizio);
 
 export { rodizioRoutes };

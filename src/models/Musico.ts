@@ -17,17 +17,20 @@ export class Musico {
   @Column()
   franqueza: number;
 
-  @ManyToOne(() => Nivel, nivel => nivel.id, { nullable: false })
-  nivel: Nivel;
+  @Column()
+  qtd_tocada: number;
+
+  @ManyToOne(() => Nivel, nivel => nivel.id, { nullable: false, eager: true })
+  nivel: Nivel;  
     
   @Column()
   instrumento: string;
 
-  @ManyToMany(() => Voz)
+  @ManyToMany(() => Voz, {eager: true})
   @JoinTable()
   vozes: Voz[];
 
-  @ManyToMany(() => Culto)
+  @ManyToMany(() => Culto, {eager: true})
   @JoinTable()
   cultos: Culto[];
 }
