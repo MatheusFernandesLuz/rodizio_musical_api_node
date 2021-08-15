@@ -5,7 +5,7 @@
   "username": "root",
   "password": "w%@I90AZw@uh",
   "database": "rodizio_musical_api_node",
-  "synchronize": true,
+  "synchronize": false,
   "migrations": ["./src/database/migrations/**.ts"],
   "entities": ["./src/models/**.ts"],
   "cli": {

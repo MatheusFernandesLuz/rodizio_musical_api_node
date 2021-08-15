@@ -12,28 +12,10 @@ interface GetRodizio {
 }
 
 class RodizioController {
-  async obterMusicoFranco(req: Request, res: Response) {
-    const data = req.body;
-    const repo = getRepository(Musico);
-
-    const franco = await repo.createQueryBuilder("musico")
-      .leftJoinAndSelect("musico.cultos", "culto")
-      .leftJoinAndSelect("musico.vozes", "voz")
-      .where(`culto.nome = '${data.culto}'`)
-      .andWhere(`voz.nome = '${data.voz}'`)
-      .andWhere('musico.franqueza > 1')
-      .take(1)
-      .getMany();
-  
-    return res.status(StatusCodes.OK).json(franco);
-  }
-  
   async getRodizio(req: Request, res: Response) {
     const data = req.body as GetRodizio;
     const repo = getRepository(Musico);
     let musicos: Musico[] = [];
-    let resultado: Musico[] = [];
-    let ids = [];
 
     const vozes = [
       {
@@ -55,48 +37,20 @@ class RodizioController {
       }
     ];
 
-    // TODO: Se não houver músico franco na voz principal, verifica na voz alternativa.
-    // TODO: Retonar os dias de disponibilidade e as vozes que toca
-
     for (let i = 0; i < vozes.length; i++) {
-      let limit = vozes[i].qtd;
-
-      let franco = await repo.createQueryBuilder("musico")
+      let m = await repo.createQueryBuilder("musico")
       .leftJoinAndSelect("musico.vozes", "voz")
       .leftJoinAndSelect("musico.cultos", "culto")
       .where(`voz.nome = '${vozes[i].voz}'`)
       .andWhere(`culto.nome = '${data.culto}'`)
-      .andWhere("musico.franqueza > 1")
-      .orderBy("musico.qtd_tocada", "ASC")
-      .getOne();
+      .orderBy("musico_culto.qtd_tocada", "ASC")      
+      .limit(vozes[i].qtd)
+      .getMany();
       
-      
-      if (franco) {
-        musicos.push(franco);
-        limit = vozes[i].qtd - 1;
-      }
-      
-      if (limit > 0) {
-        let outros = await repo.createQueryBuilder("musico")
-        .leftJoinAndSelect("musico.vozes", "voz")
-        .leftJoinAndSelect("musico.cultos", "culto")
-        .where(`voz.nome = '${vozes[i].voz}'`)
-        .andWhere(`culto.nome = '${data.culto}'`)
-        .andWhere(`musico.id NOT IN ('${franco && franco.id}')`)
-        .orderBy("musico.qtd_tocada", "ASC")      
-        .limit(limit)
-        .getMany();
-        
-        musicos.push(...outros);
-      }
+      musicos.push(...m);
     }
 
-    for (let i = 0; i < musicos.length; i++) {
-      ids.push(musicos[i].id)
-    }
-
-    resultado = await repo.find({ where: `musico.id IN ('${ids.join("','")}')` });
-    return res.status(StatusCodes.OK).json(resultado);
+    return res.status(StatusCodes.OK).json(musicos);
   }
 }
 

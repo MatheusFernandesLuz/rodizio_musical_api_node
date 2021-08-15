@@ -8,4 +8,7 @@ export class Voz {
 
   @Column()
   nome: string;
+
+  @OneToMany(() => Musico, musico => musico.id)
+  musico: Musico[];
 }

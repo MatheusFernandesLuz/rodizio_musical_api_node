@@ -1,11 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToMany, JoinTable, Unique, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn } from "typeorm";
 import { Culto } from "./Culto";
 import { Nivel } from "./Nivel";
 import { Voz } from "./Voz";
 
 @Entity("musico")
 export class Musico {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()    
   id: number;
 
   @Column()
@@ -14,23 +14,29 @@ export class Musico {
   @Column()
   celular: string;
 
-  @Column()
-  franqueza: number;
-
-  @Column()
-  qtd_tocada: number;
-
-  @ManyToOne(() => Nivel, nivel => nivel.id, { nullable: false, eager: true })
+  @ManyToOne(() => Nivel, nivel => nivel.musicos)
+  @JoinColumn({ name: "nivel_id" })
   nivel: Nivel;  
     
   @Column()
   instrumento: string;
 
-  @ManyToMany(() => Voz, {eager: true})
-  @JoinTable()
+  @Column()
+  voz_principal: number;
+
+  @ManyToMany(() => Voz)
+  @JoinTable({
+    name: "musicovoz",
+    joinColumn: { name: "musico_id"},
+    inverseJoinColumn: { name: "voz_id" }
+  })
   vozes: Voz[];
 
-  @ManyToMany(() => Culto, {eager: true})
-  @JoinTable()
+  @ManyToMany(() => Culto)
+  @JoinTable({
+    name: "musicoculto",
+    joinColumn: { name: "musico_id"},
+    inverseJoinColumn: { name: "culto_id" }
+  })
   cultos: Culto[];
 }
