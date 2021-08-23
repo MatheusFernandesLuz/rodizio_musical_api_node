@@ -8,6 +8,7 @@ import { Culto } from "../models/Culto";
 import { Musico } from "../models/Musico";
 
 interface IResultadoRodizio {
+  id: number;
   data: Date;
   culto: string;
   musicos: IMusicoRodizio[];
@@ -56,10 +57,11 @@ class RodizioController {
     const repo_musico = getCustomRepository(MusicoRepository);
     const repo_rodizio = getCustomRepository(RodizioRepository);
 
-    const resultado: IResultadoRodizio = { culto: null, data: null, musicos: [] };
+    const resultado: IResultadoRodizio = { id: null, culto: null, data: null, musicos: [] };
 
     await repo_rodizio.BuscaRodizioPorData(data)
     .then(r => {
+      resultado.id = r.id,
       resultado.data = r.data_rodizio,
       resultado.culto = r.culto
     });

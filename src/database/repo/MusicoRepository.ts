@@ -5,7 +5,7 @@ import { Rodizio } from "../../models/Rodizio";
 import { Voz } from "../../models/Voz";
 
 export interface IMusicoRodizio extends Musico {
-  voz_escalada: Voz;
+  voz_escalada: string;
 }
 
 @EntityRepository(Musico)
