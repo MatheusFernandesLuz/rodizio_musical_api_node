@@ -16,6 +16,24 @@ class MusicoController {
     
     return res.status(StatusCodes.OK).json(musicos);
   }
+
+  async getByVozAndCulto(req: Request, res: Response) {
+    const data = req.body as GetByVozAndCultoRequest;
+    const repo = getRepository(Musico);
+    
+    const resultado = await repo
+      .createQueryBuilder("musico")
+      .leftJoinAndSelect("musico.nivel", "nivel")
+      .leftJoinAndSelect("musico.vozes", "voz")
+      .leftJoinAndSelect("musico.cultos", "culto")
+      .where(`voz.nome = '${data.voz}'`)
+      .andWhere(`culto.nome = '${data.culto}'`)
+      .andWhere(`musico.id NOT IN ('${data?.execao.join("','") || ""}')`)
+      .orderBy("musico_culto.qtd_tocada", "ASC")
+      .getMany();
+    
+    res.status(StatusCodes.OK).json(resultado);
+  }
 }
 
 export { MusicoController }

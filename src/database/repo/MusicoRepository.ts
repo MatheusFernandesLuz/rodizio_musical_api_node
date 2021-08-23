@@ -1,0 +1,66 @@
+import { EntityRepository, getConnection, Repository } from "typeorm";
+import { Musico } from "../../models/Musico";
+import { MusicoRodizio } from "../../models/MusicoRodizio";
+import { Rodizio } from "../../models/Rodizio";
+import { Voz } from "../../models/Voz";
+
+export interface IMusicoRodizio extends Musico {
+  voz_escalada: Voz;
+}
+
+@EntityRepository(Musico)
+class MusicoRepository extends Repository<Musico> {
+
+  BuscaMusicosPorVozECulto(voz: number, culto: string, quantidade: number, execao?: number[]) {
+    return this.createQueryBuilder("musico")
+      .leftJoinAndSelect("musico.vozes", "voz")
+      .leftJoinAndSelect("musico.cultos", "culto")
+      .where(`voz.id = '${voz}'`)
+      .andWhere(`culto.nome = '${culto}'`)
+      .andWhere(`musico.id NOT IN ('${execao.join("','")}')`)
+      .orderBy("musico_culto.qtd_tocada", "ASC")
+      .limit(quantidade)
+      .getMany();
+  }
+
+  InsereNoRodizio(musico_id: number, rodizio_id: number, voz_id: number) {   
+    getConnection()
+      .createQueryBuilder()
+      .insert()
+      .into(MusicoRodizio)
+      .values({ musico_id: musico_id, rodizio_id: rodizio_id, voz_id: voz_id })
+      .execute();
+  }
+
+  async BuscaMusicosPorDataRodizio(data: string): Promise<IMusicoRodizio[]> {
+    const resultado: IMusicoRodizio[] = [];
+
+    await getConnection()
+    .createQueryBuilder()
+    .select("musico.id, voz.id as voz_escalada")
+    .from(Rodizio, "rodizio")
+    .leftJoin(MusicoRodizio, "mr", "mr.rodizio_id = rodizio.id")
+    .leftJoin(Musico, "musico", "musico.id = mr.musico_id")
+    .leftJoin(Voz, "voz", "voz.id = mr.voz_id")
+    .where(`rodizio.data_rodizio = ${data}`)
+    .getRawMany()
+    .then(async musicos => {
+      for (let i = 0; i < musicos.length; i++) {
+        const musico = await this.findOne(
+          {
+            relations: ["vozes", "cultos"],
+            where: { id: musicos[i].id }
+          });
+        
+        resultado.push({
+          ...musico,
+          voz_escalada: musicos[i].voz_escalada
+        });
+      }
+    });
+
+    return resultado;
+  }
+}
+
+export { MusicoRepository };
