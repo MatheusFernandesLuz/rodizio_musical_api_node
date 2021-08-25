@@ -59,7 +59,7 @@ class RodizioController {
 
     const resultado: IResultadoRodizio = { id: null, culto: null, data: null, musicos: [] };
 
-    await repo_rodizio.BuscaRodizioPorData(id)
+    await repo_rodizio.BuscaRodizio(id)
     .then(r => {
       resultado.id = r.id,
       resultado.data = r.data_rodizio,
@@ -74,7 +74,7 @@ class RodizioController {
 
   async findAll(req: Request, res: Response) {
     const repo = getCustomRepository(RodizioRepository);
-    const result = repo.BuscaTodosRodizios();    
+    const result = await repo.BuscaTodosRodizios();    
     return res.status(StatusCodes.OK).json(result);
   }
 
