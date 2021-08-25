@@ -18,7 +18,7 @@ class MusicoController {
   }
 
   async getByVozAndCulto(req: Request, res: Response) {
-    const data = req.body as GetByVozAndCultoRequest;
+    const { voz, culto } = req.params;
     const repo = getRepository(Musico);
     
     const resultado = await repo
@@ -26,13 +26,12 @@ class MusicoController {
       .leftJoinAndSelect("musico.nivel", "nivel")
       .leftJoinAndSelect("musico.vozes", "voz")
       .leftJoinAndSelect("musico.cultos", "culto")
-      .where(`voz.nome = '${data.voz}'`)
-      .andWhere(`culto.nome = '${data.culto}'`)
-      .andWhere(`musico.id NOT IN ('${data?.execao.join("','") || ""}')`)
+      .where(`voz.id = '${voz}'`)
+      .andWhere(`culto.id = '${culto}'`)
       .orderBy("musico_culto.qtd_tocada", "ASC")
       .getMany();
     
-    res.status(StatusCodes.OK).json(resultado);
+    return res.status(StatusCodes.OK).json(resultado);
   }
 }
 

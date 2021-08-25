@@ -5,6 +5,6 @@ const musicoRoutes = Router();
 const musicoController = new MusicoController();
 
 musicoRoutes.get('/musicos', musicoController.getAllMusicos);
-musicoRoutes.post('/musicos/trocar', musicoController.getByVozAndCulto);
+musicoRoutes.get('/musicos/:voz/:culto', musicoController.getByVozAndCulto);
 
 export { musicoRoutes }
