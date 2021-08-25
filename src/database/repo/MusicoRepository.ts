@@ -32,7 +32,7 @@ class MusicoRepository extends Repository<Musico> {
       .execute();
   }
 
-  async BuscaMusicosPorDataRodizio(data: string): Promise<IMusicoRodizio[]> {
+  async BuscaMusicosPorRodizio(rodizio_id: string): Promise<IMusicoRodizio[]> {
     const resultado: IMusicoRodizio[] = [];
 
     await getConnection()
@@ -42,7 +42,7 @@ class MusicoRepository extends Repository<Musico> {
     .leftJoin(MusicoRodizio, "mr", "mr.rodizio_id = rodizio.id")
     .leftJoin(Musico, "musico", "musico.id = mr.musico_id")
     .leftJoin(Voz, "voz", "voz.id = mr.voz_id")
-    .where(`rodizio.data_rodizio = ${data}`)
+    .where(`rodizio.id = ${rodizio_id}`)
     .getRawMany()
     .then(async musicos => {
       for (let i = 0; i < musicos.length; i++) {

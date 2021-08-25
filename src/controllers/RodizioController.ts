@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { getCustomRepository, getRepository } from "typeorm";
+import { getConnection, getCustomRepository, getRepository } from "typeorm";
 import { IMusicoRodizio, MusicoRepository } from "../database/repo/MusicoRepository";
 import { RodizioRepository } from "../database/repo/RodizioRepository";
 import { GenerateRodizioRequest } from "../interfaces/requests/generateRodizioRequest";
 import { Culto } from "../models/Culto";
 import { Musico } from "../models/Musico";
+import { Rodizio } from "../models/Rodizio";
 
 interface IResultadoRodizio {
   id: number;
@@ -53,23 +54,34 @@ class RodizioController {
   }
 
   async getRodizio(req: Request, res: Response) {
-    const { data } = req.params;
+    const { id } = req.params;
     const repo_musico = getCustomRepository(MusicoRepository);
     const repo_rodizio = getCustomRepository(RodizioRepository);
 
     const resultado: IResultadoRodizio = { id: null, culto: null, data: null, musicos: [] };
 
-    await repo_rodizio.BuscaRodizioPorData(data)
+    await repo_rodizio.BuscaRodizioPorData(id)
     .then(r => {
       resultado.id = r.id,
       resultado.data = r.data_rodizio,
       resultado.culto = r.culto
     });
 
-    const musicos = await repo_musico.BuscaMusicosPorDataRodizio(data);
+    const musicos = await repo_musico.BuscaMusicosPorRodizio(id);
     resultado.musicos = musicos;
 
     return res.status(StatusCodes.OK).json(resultado);
+  }
+
+  async findAll(req: Request, res: Response) {
+    const result = await getConnection()
+      .createQueryBuilder()
+      .select("rodizio.id, rodizio.data_rodizio as data, culto.nome as culto")
+      .from(Rodizio, "rodizio")
+      .leftJoin(Culto, "culto", "rodizio.culto_id = culto.id")
+      .getRawMany();
+    
+    return res.status(StatusCodes.OK).json(result);
   }
 }
 

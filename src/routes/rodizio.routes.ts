@@ -4,7 +4,8 @@ import { RodizioController } from "../controllers/RodizioController";
 const rodizioRoutes = Router();
 const rodizioController = new RodizioController();
 
+rodizioRoutes.get("/rodizio", rodizioController.findAll);
 rodizioRoutes.post('/rodizio/gerar', rodizioController.geraRodizio);
-rodizioRoutes.get('/rodizio/:data', rodizioController.getRodizio);
+rodizioRoutes.get('/rodizio/:id', rodizioController.getRodizio);
 
 export { rodizioRoutes };
