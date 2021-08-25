@@ -6,6 +6,7 @@ import { RodizioRepository } from "../database/repo/RodizioRepository";
 import { GenerateRodizioRequest } from "../interfaces/requests/generateRodizioRequest";
 import { Culto } from "../models/Culto";
 import { Musico } from "../models/Musico";
+import { MusicoRodizio } from "../models/MusicoRodizio";
 import { Rodizio } from "../models/Rodizio";
 
 interface IResultadoRodizio {
@@ -80,6 +81,19 @@ class RodizioController {
       .from(Rodizio, "rodizio")
       .leftJoin(Culto, "culto", "rodizio.culto_id = culto.id")
       .getRawMany();
+    
+    return res.status(StatusCodes.OK).json(result);
+  }
+
+  async trocaVozMusico(req: Request, res: Response) {
+    const data = req.body;
+
+    const result = await getConnection()
+      .createQueryBuilder()
+      .update(MusicoRodizio)
+      .set({ voz_id: () => data.voz_id })
+      .where(`musico_id = ${data.musico_id} AND rodizio_id = ${data.rodizio_id}`)
+      .execute();
     
     return res.status(StatusCodes.OK).json(result);
   }
