@@ -5,11 +5,11 @@ import { Rodizio } from "../../models/Rodizio";
 
 @EntityRepository(Rodizio)
 class RodizioRepository extends Repository<Rodizio> {  
-  async BuscaRodizioPorData(id: string) {
+  async BuscaRodizio(id: string) {
     return await
       getConnection()
       .createQueryBuilder()
-      .select("rodizio.id, rodizio.data_rodizio, culto.nome as culto")
+      .select("rodizio.id, rodizio.data_rodizio, culto.id as culto")
       .from(Rodizio, "rodizio")
       .leftJoin(Culto, "culto", "culto.id = rodizio.culto_id")
       .where(`rodizio.id = ${id}`)
@@ -19,7 +19,7 @@ class RodizioRepository extends Repository<Rodizio> {
   async BuscaTodosRodizios() {
     return await getConnection()
     .createQueryBuilder()
-    .select("rodizio.id, rodizio.data_rodizio as data, culto.nome as culto")
+    .select("rodizio.id, rodizio.data_rodizio as data, culto.id as culto")
     .from(Rodizio, "rodizio")
     .leftJoin(Culto, "culto", "rodizio.culto_id = culto.id")
     .getRawMany();
