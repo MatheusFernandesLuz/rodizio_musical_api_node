@@ -84,11 +84,11 @@ class RodizioController {
     const result = repo.TrocaVozMusico(data.rodizio_id, data.musico_id, data.voz_id);    
     return res.status(StatusCodes.OK).json(result);
   }
-
-  async BuscaAlternativas(req: Request, res: Response) {
-    const data = req.body;
-
-
+  
+  async trocaMusicoRodizio(req: Request, res: Response) {
+    const { rodizio_id, antigo_id, novo_id } = req.body;
+    const result = await getCustomRepository(RodizioRepository).TrocaMusicoRodizio(rodizio_id, antigo_id, novo_id);
+    return res.status(StatusCodes.CREATED).json(result);
   }
 }
 
