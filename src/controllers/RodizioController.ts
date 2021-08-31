@@ -43,8 +43,9 @@ class RodizioController {
     const { id } = req.params;
     const repo_rodizio = getCustomRepository(RodizioRepository);
 
-    const rodizio = await repo_rodizio.findOne({ where: { id: id } });
-    repo_rodizio.RetiraDoRodizio(rodizio.id, rodizio.musicos);    
+    const rodizio = await repo_rodizio.findOne({ relations: ["musicos"], where: { id } });
+    console.log(rodizio);
+    await repo_rodizio.RetiraDoRodizio(rodizio.id, rodizio.musicos);    
     
     const novosMusicos = await repo_rodizio.SelecionaMusicos({
       rodizio_id: rodizio.id,

@@ -64,7 +64,7 @@ class RodizioRepository extends Repository<Rodizio> {
   async RetiraDoRodizio(rodizio_id: number, musicos: Musico[]) {
     const conn = getConnection();
 
-    for (let i = 0; i < musicos.length; i++) {
+    for (let i = 0; i < musicos?.length; i++) {
       const musico = musicos[i];
       
       await conn.createQueryBuilder().delete().from(MusicoRodizio)
