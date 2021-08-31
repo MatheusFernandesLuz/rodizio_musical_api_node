@@ -8,10 +8,20 @@ export interface IMusicoRodizio extends Musico {
   voz_escalada: string;
 }
 
+export interface IVozQuantidade {
+  soprano: number;
+  contralto: number;
+  tenor: number;
+  baixo: number;
+}
+
+export interface ISelectMusicos extends IVozQuantidade {
+  culto: string;
+}
+
 @EntityRepository(Musico)
 class MusicoRepository extends Repository<Musico> {
-
-  BuscaMusicosPorVozECulto(voz: number, culto: string, quantidade: number, execao?: number[]) {
+  async BuscaMusicosPorVozECulto(voz: number, culto: string, quantidade: number, execao?: number[]) {
     return this.createQueryBuilder("musico")
       .leftJoinAndSelect("musico.vozes", "voz")
       .leftJoinAndSelect("musico.cultos", "culto")
@@ -21,15 +31,6 @@ class MusicoRepository extends Repository<Musico> {
       .orderBy("musico_culto.qtd_tocada", "ASC")
       .limit(quantidade)
       .getMany();
-  }
-
-  InsereNoRodizio(musico_id: number, rodizio_id: number, voz_id: number) {   
-    getConnection()
-      .createQueryBuilder()
-      .insert()
-      .into(MusicoRodizio)
-      .values({ musico_id: musico_id, rodizio_id: rodizio_id, voz_id: voz_id })
-      .execute();
   }
 
   async BuscaMusicosPorRodizio(rodizio_id: string): Promise<IMusicoRodizio[]> {

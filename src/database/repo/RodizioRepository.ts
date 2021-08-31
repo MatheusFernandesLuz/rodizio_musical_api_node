@@ -3,9 +3,80 @@ import { Culto } from "../../models/Culto";
 import { Musico } from "../../models/Musico";
 import { MusicoRodizio } from "../../models/MusicoRodizio";
 import { Rodizio } from "../../models/Rodizio";
+import { MusicoRepository } from "./MusicoRepository";
+
+export interface IVozQuantidade {
+  soprano: number;
+  contralto: number;
+  tenor: number;
+  baixo: number;
+}
+
+export interface ISelectMusicos extends IVozQuantidade {
+  rodizio_id: number;
+  culto: string;  
+}
 
 @EntityRepository(Rodizio)
-class RodizioRepository extends Repository<Rodizio> {  
+class RodizioRepository extends Repository<Rodizio> {
+  async SelecionaMusicos(opcoes: ISelectMusicos): Promise<Musico[]> {
+    const { rodizio_id, culto, ...qtd } = opcoes;
+    const resultado: Musico[] = [];
+    const repo_musicos = getCustomRepository(MusicoRepository);
+
+    const vozes = [
+      { id: 1, qtd: qtd.soprano },
+      { id: 2, qtd: qtd.contralto },
+      { id: 3,qtd: qtd.tenor },
+      { id: 4, qtd: qtd.baixo }
+    ];
+
+    for (let i = 0; i < vozes.length; i++) {
+      const voz = vozes[i];
+
+      let musicos =
+        await repo_musicos.BuscaMusicosPorVozECulto(
+        voz.id,
+        culto,
+        voz.qtd,
+        resultado.map(m => m.id)
+      );
+      
+      await this.InsereNoRodizio(rodizio_id, musicos, voz.id);
+      resultado.push(...musicos);
+    }    
+
+    return resultado;
+  }
+
+  async InsereNoRodizio(rodizio_id: number, musicos: Musico[], voz_id: number) {   
+    const conn = getConnection();
+
+    for (let i = 0; i < musicos.length; i++) {
+      const musico = musicos[i];
+      
+      conn
+        .createQueryBuilder()
+        .insert()
+        .into(MusicoRodizio)
+        .values({ musico_id: musico.id, rodizio_id: rodizio_id, voz_id: voz_id });
+    }
+  }
+
+  async RetiraDoRodizio(rodizio_id: number, musicos: Musico[]) {
+    const conn = getConnection();
+
+    for (let i = 0; i < musicos.length; i++) {
+      const musico = musicos[i];
+      
+      conn
+        .createQueryBuilder()
+        .delete()
+        .from(MusicoRodizio)
+        .where(`rodizio_id = ${rodizio_id} AND musico_id = ${musico.id}`);
+    }
+  }
+
   async BuscaRodizio(id: string) {
     return await
       getConnection()

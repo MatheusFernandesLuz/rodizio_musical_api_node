@@ -5,7 +5,6 @@ import { IMusicoRodizio, MusicoRepository } from "../database/repo/MusicoReposit
 import { RodizioRepository } from "../database/repo/RodizioRepository";
 import { GenerateRodizioRequest } from "../interfaces/requests/generateRodizioRequest";
 import { Culto } from "../models/Culto";
-import { Musico } from "../models/Musico";
 
 interface IResultadoRodizio {
   id: number;
@@ -18,38 +17,47 @@ class RodizioController {
   async geraRodizio(req: Request, res: Response) {
     const data = req.body as GenerateRodizioRequest;
     const repo_rodizio = getCustomRepository(RodizioRepository);
-    const repo_musicos = getCustomRepository(MusicoRepository);
     const culto_repo = getRepository(Culto);
-    let MusicosRodizio: Musico[] = [];
 
-    const vozes = [
-      { id: 1, qtd: data.soprano },
-      { id: 2, qtd: data.contralto },
-      { id: 3,qtd: data.tenor },
-      { id: 4, qtd: data.baixo }
-    ];
-    
     const newRodizio = await repo_rodizio.save({
       culto_id: (await culto_repo.findOne({where: {nome: data.culto}})).id,
       data_rodizio: data.data
     });   
 
-    for (let i = 0; i < vozes.length; i++) {
-      const voz = vozes[i];      
-      let alreadyIncluded = MusicosRodizio.map(m => m.id);
-      
-      await repo_musicos
-        .BuscaMusicosPorVozECulto(voz.id, data.culto, voz.qtd, alreadyIncluded)
-        .then(musicos => {
-          for (let i = 0; i < musicos.length; i++) {
-            const musico = musicos[i];
-            repo_musicos.InsereNoRodizio(musico.id, newRodizio.id, voz.id);
-            MusicosRodizio.push(musico);            
-          }
-        });
-    }
+    repo_rodizio.SelecionaMusicos({
+      rodizio_id: newRodizio.id,
+      culto: data.culto,
+      soprano: data.soprano,
+      contralto: data.contralto,
+      tenor: data.tenor,
+      baixo: data.baixo
+    })
     
     return res.status(StatusCodes.CREATED).json(newRodizio);
+  }
+
+  async regerarRodizio(req: Request, res: Response) {
+    const data = req.body as GenerateRodizioRequest;
+    const { id } = req.params;
+    const repo_rodizio = getCustomRepository(RodizioRepository);
+
+    const rodizio = await repo_rodizio.findOne({ where: { id: id } });
+    repo_rodizio.RetiraDoRodizio(rodizio.id, rodizio.musicos);    
+    
+    const novosMusicos = await repo_rodizio.SelecionaMusicos({
+      rodizio_id: rodizio.id,
+      culto: data.culto,
+      soprano: data.soprano,
+      contralto: data.contralto,
+      tenor: data.tenor,
+      baixo: data.baixo
+    });
+    
+    rodizio.data_rodizio = data.data;
+    rodizio.musicos = novosMusicos;
+    repo_rodizio.save(rodizio);
+
+    res.status(StatusCodes.CREATED).json(rodizio);
   }
 
   async getRodizio(req: Request, res: Response) {
