@@ -55,11 +55,9 @@ class RodizioRepository extends Repository<Rodizio> {
     for (let i = 0; i < musicos.length; i++) {
       const musico = musicos[i];
       
-      conn
-        .createQueryBuilder()
-        .insert()
-        .into(MusicoRodizio)
-        .values({ musico_id: musico.id, rodizio_id: rodizio_id, voz_id: voz_id });
+      await conn.createQueryBuilder().insert().into(MusicoRodizio)
+        .values({ musico_id: musico.id, rodizio_id: rodizio_id, voz_id: voz_id })
+        .execute();
     }
   }
 
@@ -69,11 +67,9 @@ class RodizioRepository extends Repository<Rodizio> {
     for (let i = 0; i < musicos.length; i++) {
       const musico = musicos[i];
       
-      conn
-        .createQueryBuilder()
-        .delete()
-        .from(MusicoRodizio)
-        .where(`rodizio_id = ${rodizio_id} AND musico_id = ${musico.id}`);
+      await conn.createQueryBuilder().delete().from(MusicoRodizio)
+        .where(`rodizio_id = ${rodizio_id} AND musico_id = ${musico.id}`)
+        .execute();
     }
   }
 

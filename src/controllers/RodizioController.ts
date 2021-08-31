@@ -24,7 +24,7 @@ class RodizioController {
       data_rodizio: data.data
     });   
 
-    repo_rodizio.SelecionaMusicos({
+    const musicos = await repo_rodizio.SelecionaMusicos({
       rodizio_id: newRodizio.id,
       culto: data.culto,
       soprano: data.soprano,
@@ -32,7 +32,9 @@ class RodizioController {
       tenor: data.tenor,
       baixo: data.baixo
     })
-    
+
+    newRodizio.musicos = musicos;
+    await repo_rodizio.save(newRodizio);
     return res.status(StatusCodes.CREATED).json(newRodizio);
   }
 
@@ -55,9 +57,9 @@ class RodizioController {
     
     rodizio.data_rodizio = data.data;
     rodizio.musicos = novosMusicos;
-    repo_rodizio.save(rodizio);
-
-    res.status(StatusCodes.CREATED).json(rodizio);
+    
+    await repo_rodizio.save(rodizio);
+    return res.status(StatusCodes.CREATED).json(rodizio);
   }
 
   async getRodizio(req: Request, res: Response) {
