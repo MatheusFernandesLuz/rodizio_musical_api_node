@@ -89,6 +89,15 @@ class RodizioController {
     return res.status(StatusCodes.OK).json(result);
   }
 
+  async deletaRodizio(req: Request, res: Response) {
+    const repo = getCustomRepository(RodizioRepository);
+    const { id } = req.params;
+
+    const result = repo.DeletaRodizio(parseInt(id));
+
+    return res.status(StatusCodes.OK).json(result);
+  }
+
   async trocaVozMusico(req: Request, res: Response) {
     const data = req.body;
     const repo = getCustomRepository(RodizioRepository);

@@ -93,6 +93,17 @@ class RodizioRepository extends Repository<Rodizio> {
     .getRawMany();
   }
 
+  async DeletaRodizio(id: number) {
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(MusicoRodizio)
+      .where(`rodizio_id = ${id}`)
+      .execute();
+    
+    return await this.delete({ id });
+  }
+
   async TrocaVozMusico(rodizio_id: number, musico_id: number, voz_id: number) {
     return await getConnection()
       .createQueryBuilder()
