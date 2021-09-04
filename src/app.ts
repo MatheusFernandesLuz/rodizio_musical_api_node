@@ -5,6 +5,7 @@ import "reflect-metadata";
 import "express-async-errors";
 import { rodizioRoutes  } from "./routes/rodizio.routes";
 import { musicoRoutes } from "./routes/musico.routes";
+import { cultoRoutes } from "./routes/culto.routes";
 
 // Cria a conexão com o banco com base no arquivo ormconfig.json
 createConnection();
@@ -30,6 +31,6 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
-app.use([rodizioRoutes, musicoRoutes]);
+app.use([rodizioRoutes, musicoRoutes, cultoRoutes]);
 
 export default app;
