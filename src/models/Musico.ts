@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn } from "typeorm";
 import { Culto } from "./Culto";
+import { Instrumento } from "./Instrumento";
 import { Nivel } from "./Nivel";
 import { Voz } from "./Voz";
 
@@ -18,8 +19,9 @@ export class Musico {
   @JoinColumn({ name: "nivel_id" })
   nivel: Nivel;  
     
-  @Column()
-  instrumento: string;
+  @ManyToOne(() => Instrumento, instrumento => instrumento.musicos)
+  @JoinColumn({ name: "instrumento_id" })
+  instrumento: Instrumento;
 
   @Column()
   voz_principal: number;

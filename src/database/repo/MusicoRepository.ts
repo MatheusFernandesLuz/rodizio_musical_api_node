@@ -1,6 +1,7 @@
-import { EntityRepository, getConnection, Repository } from "typeorm";
+import { EntityRepository, getConnection, getRepository, Repository } from "typeorm";
 import { Musico } from "../../models/Musico";
 import { MusicoRodizio } from "../../models/MusicoRodizio";
+import { Nivel } from "../../models/Nivel";
 import { Rodizio } from "../../models/Rodizio";
 import { Voz } from "../../models/Voz";
 
@@ -23,6 +24,7 @@ export interface ISelectMusicos extends IVozQuantidade {
 class MusicoRepository extends Repository<Musico> {
   async BuscaMusicosPorVozECulto(voz: number, culto: string, quantidade: number, execao?: number[]) {
     return this.createQueryBuilder("musico")
+      .leftJoinAndSelect("musico.instrumento", "instrumento")
       .leftJoinAndSelect("musico.vozes", "voz")
       .leftJoinAndSelect("musico.cultos", "culto")
       .where(`voz.id = '${voz}'`)
@@ -49,7 +51,7 @@ class MusicoRepository extends Repository<Musico> {
       for (let i = 0; i < musicos.length; i++) {
         const musico = await this.findOne(
           {
-            relations: ["vozes", "cultos"],
+            relations: ["vozes", "cultos", "instrumento"],
             where: { id: musicos[i].id }
           });
         
@@ -61,6 +63,19 @@ class MusicoRepository extends Repository<Musico> {
     });
 
     return resultado;
+  }
+
+  async SaveMusico(musico: Musico): Promise<Musico> {
+    return await this.save(musico);
+  }
+
+  async BuscarNiveis(): Promise<Nivel[]> {
+    const repo_nivel = getRepository(Nivel);
+    return await repo_nivel.find();
+  }
+
+  async BuscarInstrumentos() {
+    return await this.find({ select: ["instrumento"] });
   }
 }
 

@@ -1,4 +1,4 @@
-import { EntityRepository, getConnection, getCustomRepository, getRepository, Repository } from "typeorm";
+import { EntityRepository, getConnection, getCustomRepository, Repository } from "typeorm";
 import { Culto } from "../../models/Culto";
 import { Musico } from "../../models/Musico";
 import { MusicoCulto } from "../../models/MusicoCulto";

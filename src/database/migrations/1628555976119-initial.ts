@@ -23,19 +23,27 @@ export class initial1628555976119 implements MigrationInterface {
                 id int primary key auto_increment,
                 nome varchar(255) not null
             );`
-        );         
+        );
+        
+        await queryRunner.query(`
+            create table Instrumento (
+                id int primary key auto_increment,
+                nome varchar(255) not null
+            );`
+        );
                  
         await queryRunner.query(`
             create table Musico (
                 id int primary key auto_increment,
                 nome varchar(255) not null,
                 celular varchar(11),
-                instrumento varchar(255) not null,                
+                instrumento_id int not null,                
                 nivel_id int not null,
                 voz_principal int not null,
 
                 foreign key (nivel_id) references Nivel(id),
-                foreign key (voz_principal) references Voz(id)
+                foreign key (voz_principal) references Voz(id),
+                foreign key (instrumento_id) references Instrumento(id)
             );`
         );        
             
@@ -68,6 +76,7 @@ export class initial1628555976119 implements MigrationInterface {
         await queryRunner.query("drop table MusicoCulto;");
         await queryRunner.query("drop table MusicoVoz;");
         await queryRunner.query("drop table Musico;");
+        await queryRunner.query("drop table Instrumento;");
         await queryRunner.query("drop table Culto;");
         await queryRunner.query("drop table Nivel;");
         await queryRunner.query("drop table Voz;");

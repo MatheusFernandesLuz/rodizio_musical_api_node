@@ -9,6 +9,7 @@ class MusicoController {
 
     const musicos = await repo
       .createQueryBuilder("musicos")
+      .leftJoinAndSelect("musicos.instrumento", "instrumento")
       .leftJoinAndSelect("musicos.nivel", "nivel")
       .leftJoinAndSelect("musicos.vozes", "voz")
       .leftJoinAndSelect("musicos.cultos", "culto")
@@ -23,6 +24,7 @@ class MusicoController {
     
     const resultado = await repo
       .createQueryBuilder("musico")
+      .leftJoinAndSelect("musico.instrumento", "instrumento")
       .leftJoinAndSelect("musico.nivel", "nivel")
       .leftJoinAndSelect("musico.vozes", "voz")
       .leftJoinAndSelect("musico.cultos", "culto")
