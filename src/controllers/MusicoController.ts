@@ -9,6 +9,7 @@ import { Musico } from "../models/Musico";
 import { Voz } from "../models/Voz";
 
 interface IMusicoRequest {
+  id?: number;
   nome: string;
   celular: string;
   instrumento: number;
@@ -70,6 +71,7 @@ class MusicoController {
 
     const musico = new Musico();
 
+    musico.id = dados.id || null;
     musico.nome = dados.nome;    
     musico.nome = dados.nome;
     musico.celular = dados.celular;
