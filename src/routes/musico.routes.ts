@@ -13,7 +13,7 @@ musicoRoutes.get('/musicos/:id', musicoController.getOne);
 musicoRoutes.get('/musicos/:culto/:voz', musicoController.getByVozAndCulto);
 musicoRoutes.post('/musicos', musicoController.createMusico);
 
-musicoRoutes.get('/musicos/niveis', nivelController.getAllNiveis);
-musicoRoutes.get('/musicos/instrumentos', instrumentoController.getAllInstrumentos);
+musicoRoutes.get('/niveis', nivelController.getAllNiveis);
+musicoRoutes.get('/instrumentos', instrumentoController.getAllInstrumentos);
 
 export { musicoRoutes }
