@@ -9,6 +9,7 @@ const nivelController = new NivelController();
 const instrumentoController = new InstrumentoController();
 
 musicoRoutes.get('/musicos', musicoController.getAllMusicos);
+musicoRoutes.get('/musicos/:id', musicoController.getOne);
 musicoRoutes.get('/musicos/:culto/:voz', musicoController.getByVozAndCulto);
 musicoRoutes.post('/musicos', musicoController.createMusico);
 

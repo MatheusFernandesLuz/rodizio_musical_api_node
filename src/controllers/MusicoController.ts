@@ -51,6 +51,14 @@ class MusicoController {
     return res.status(StatusCodes.OK).json(resultado);
   }
 
+  async getOne(req: Request, res: Response) {
+    const id = req.params.id;
+    const repo = getCustomRepository(MusicoRepository);
+    const result = await repo.BuscarUmMusico(id);
+
+    return res.status(StatusCodes.OK).json(result);
+  }
+
   async createMusico(req: Request, res: Response) {
     const dados = req.body as IMusicoRequest;
 

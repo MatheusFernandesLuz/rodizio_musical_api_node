@@ -64,6 +64,13 @@ class MusicoRepository extends Repository<Musico> {
     return resultado;
   }
 
+  async BuscarUmMusico(musico_id: string): Promise<Musico> {
+    return await this.findOne({
+      where: { id: musico_id },
+      relations: ["instrumento", "vozes", "cultos"]
+    });
+  }
+
   async SaveMusico(musico: Musico): Promise<Musico> {
     return await this.save(musico);
   }
