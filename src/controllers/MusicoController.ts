@@ -1,7 +1,22 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { getRepository } from "typeorm";
+import { getCustomRepository, getRepository } from "typeorm";
+import { InstrumentoRepository } from "../database/repo/InstrumentoRepository";
+import { MusicoRepository } from "../database/repo/MusicoRepository";
+import { NivelRepository } from "../database/repo/NivelRepository";
+import { Culto } from "../models/Culto";
 import { Musico } from "../models/Musico";
+import { Voz } from "../models/Voz";
+
+interface IMusicoRequest {
+  nome: string;
+  celular: string;
+  instrumento: number;
+  nivel: number;
+  voz_principal: number;
+  vozes_alternativas: number[];
+  cultos: number[];
+};
 
 class MusicoController {
   async getAllMusicos(req: Request, res: Response) {
@@ -34,6 +49,41 @@ class MusicoController {
       .getMany();
     
     return res.status(StatusCodes.OK).json(resultado);
+  }
+
+  async createMusico(req: Request, res: Response) {
+    const dados = req.body as IMusicoRequest;
+
+    const repo_musico = getCustomRepository(MusicoRepository);
+    const repo_instrumento = getCustomRepository(InstrumentoRepository);
+    const repo_nivel = getCustomRepository(NivelRepository);
+    const repo_vozes = getRepository(Voz);
+    const repo_cultos = getRepository(Culto);
+
+    const musico = new Musico();
+
+    musico.nome = dados.nome;    
+    musico.nome = dados.nome;
+    musico.celular = dados.celular;
+    musico.voz_principal = dados.voz_principal;
+    
+    musico.instrumento = await repo_instrumento.ObterUmInstrumento(dados.instrumento);
+    musico.nivel = await repo_nivel.ObterUmNivel(dados.nivel);
+    musico.vozes = [];
+    musico.cultos = [];
+    
+    for (let i = 0; i < dados.vozes_alternativas.length; i++) {
+      const voz_id = dados.vozes_alternativas[i];
+      musico.vozes.push(await repo_vozes.findOne({ where: { id: voz_id } }));
+    }
+
+    for (let i = 0; i < dados.cultos.length; i++) {
+      const culto_id = dados.cultos[i];
+      musico.cultos.push(await repo_cultos.findOne({ where: { id: culto_id } }));
+    }
+
+    const created = await repo_musico.SaveMusico(musico);
+    res.status(StatusCodes.CREATED).json(created);
   }
 }
 

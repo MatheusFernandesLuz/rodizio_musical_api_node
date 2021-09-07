@@ -1,7 +1,6 @@
-import { EntityRepository, getConnection, getRepository, Repository } from "typeorm";
+import { EntityRepository, getConnection, Repository } from "typeorm";
 import { Musico } from "../../models/Musico";
 import { MusicoRodizio } from "../../models/MusicoRodizio";
-import { Nivel } from "../../models/Nivel";
 import { Rodizio } from "../../models/Rodizio";
 import { Voz } from "../../models/Voz";
 
@@ -67,15 +66,6 @@ class MusicoRepository extends Repository<Musico> {
 
   async SaveMusico(musico: Musico): Promise<Musico> {
     return await this.save(musico);
-  }
-
-  async BuscarNiveis(): Promise<Nivel[]> {
-    const repo_nivel = getRepository(Nivel);
-    return await repo_nivel.find();
-  }
-
-  async BuscarInstrumentos() {
-    return await this.find({ select: ["instrumento"] });
   }
 }
 
