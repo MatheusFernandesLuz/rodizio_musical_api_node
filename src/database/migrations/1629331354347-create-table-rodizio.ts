@@ -14,7 +14,7 @@ export class createTableRodizio1629331354347 implements MigrationInterface {
         `);
 
         await queryRunner.query(`
-            create table musicorodizio (
+            create table MusicoRodizio (
                 id int primary key auto_increment,
                 musico_id int not null,
                 rodizio_id int not null,
@@ -27,8 +27,8 @@ export class createTableRodizio1629331354347 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query("drop table musicorodizio");
-        await queryRunner.query("drop table rodizio");
+        await queryRunner.query("drop table MusicoRodizio");
+        await queryRunner.query("drop table Rodizio");
     }
 
 }

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Musico } from "./Musico";
 
-@Entity("nivel")
+@Entity("Nivel")
 export class Nivel {
   @PrimaryGeneratedColumn()
   id: number;

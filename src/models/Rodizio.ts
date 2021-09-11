@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from "typeorm";
 import { Musico } from "./Musico";
 
-@Entity("rodizio")
+@Entity("Rodizio")
 export class Rodizio {
   @PrimaryGeneratedColumn()
   id: number;

@@ -4,7 +4,7 @@ import { Instrumento } from "./Instrumento";
 import { Nivel } from "./Nivel";
 import { Voz } from "./Voz";
 
-@Entity("musico")
+@Entity("Musico")
 export class Musico {
   @PrimaryGeneratedColumn()    
   id: number;
